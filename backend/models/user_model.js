@@ -13,35 +13,34 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true,
-        minlength: 6 // Ensure a minimum password length
+        minlength: 6 
     },
     profilePic: {
-        type: String, // URL for the profile picture
-        default: '' // Default empty string if no picture provided
+        type: String, 
+        default: '' 
     },
-    // role: {
-    //     type: String,
-    //     enum: ['user', 'admin'], // Role can be 'user', 'admin', or 'employer'
-    //     default: 'user' // Default role is 'user'
-    // },
     resume: {
-        type: String, // URL for resume file (e.g., Cloudinary URL)
-        default: '' // Default empty string if no resume uploaded
+        type: String, 
+        default: '' 
     },
     appliedJobs: [{
-        type: mongoose.Schema.Types.ObjectId, // Store references to Job model
-        ref: 'Application' // Referencing 'Job' model
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'Application' 
     }],
+    experience:{
+        type:String,
+        default:''
+    },
     createdAt: {
         type: Date,
-        default: Date.now // Automatically set to the current date
+        default: Date.now 
     },
     updatedAt: {
         type: Date,
-        default: Date.now // Automatically set to the current date and updated when changes are made
+        default: Date.now 
     }
 }, {
-    timestamps: true // Automatically adds `createdAt` and `updatedAt` fields
+    timestamps: true 
 });
 
 const User = mongoose.model('User', userSchema);
