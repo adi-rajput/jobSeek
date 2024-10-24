@@ -9,8 +9,7 @@ const EmployerRegisterForm = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: '',
-    company: '', // Additional field for company name
+    password: '', // Additional field for company name
   });
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
@@ -38,8 +37,7 @@ const EmployerRegisterForm = () => {
         setFormData({
           name: "",
           email: "",
-          password: "",
-          company: "", // Reset company
+          password: "", // Reset company
         });
       }
     } catch (error) {
@@ -66,7 +64,7 @@ const EmployerRegisterForm = () => {
           Employer Register
         </h2>
 
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <label className="block mb-2 text-gray-700" htmlFor="company">
             Company Name
           </label>
@@ -79,7 +77,7 @@ const EmployerRegisterForm = () => {
             required
             className="w-full p-3 transition duration-200 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
-        </div>
+        </div> */}
 
         <div className="mb-4">
           <label className="block mb-2 text-gray-700" htmlFor="name">

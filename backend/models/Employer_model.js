@@ -17,7 +17,6 @@ const employerSchema =  new mongoose.Schema({
     },
     company:{
         type:String,
-        required:true,
     },
     profilePic:{
         type:String,
