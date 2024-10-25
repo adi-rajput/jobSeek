@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import upload from "../middlewares/multer.js";
 import getDataUri from "../middlewares/data_uri.js";
 import cloudinary from "../middlewares/cloudinary.js";
+import Job from "../models/Job_model.js";
 
 export const register = async (req, res) => {
   try {
@@ -175,5 +176,22 @@ export const updateProfile = async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "An error occurred while updating the profile" });
+  }
+};
+
+
+export const getActiveJobs = async (req, res) => {
+  try {
+      // Retrieve only jobs with status: true
+      const jobs = await Job.find({ status: true });
+
+      if (jobs.length === 0) {
+          return res.status(404).json({ message: 'No active jobs available', success: false });
+      }
+
+      return res.status(200).json({ jobs, success: true });
+  } catch (error) {
+      console.error("Error fetching active jobs:", error);
+      return res.status(500).json({ message: 'Server error' });
   }
 };

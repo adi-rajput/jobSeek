@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import connectDB from './utils/db.js';
 import userRoutes from './routes/User_routes.js';
 import employerRoutes from  './routes/employer_routes.js';
+import jobRoutes from './routes/Job_routes.js';
 const app = express();
 
 //middleware
@@ -36,6 +37,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/employers', employerRoutes);
+app.use('/api/v1/jobs', jobRoutes);
 
 
 const PORT = process.env.PORT || 8000;

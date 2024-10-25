@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 import upload from "../middlewares/multer.js";
 import getDataUri from "../middlewares/data_uri.js";
 import cloudinary from "../middlewares/cloudinary.js";
-
+import Job from "../models/Job_model.js";
 export const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -167,5 +167,34 @@ export const updateProfile = async (req, res) => {
     return res
       .status(500)
       .json({ message: "An error occurred while updating the profile" });
+  }
+};
+
+export const getJobs = async (req, res) => {
+  try {
+    // Ensure employer is authenticated
+    if (!req.employer || !req.employer._id) {
+      return res.status(400).json({ message: "Invalid employer" });
+    }
+
+    // Fetch the employer document
+    const employer = await Employer.findById(req.employer._id).populate('jobs');
+    
+    // Check if employer exists
+    if (!employer) {
+      return res.status(404).json({ message: "Employer not found", success: false });
+    }
+
+    // Return the jobs array from the employer document
+    const jobs = employer.jobs; // This will contain the populated Job documents
+
+    if (jobs.length === 0) {
+      return res.status(404).json({ message: "No jobs found for this employer", success: false });
+    }
+
+    return res.status(200).json({ jobs, success: true });
+  } catch (error) {
+    console.error("Error fetching jobs:", error);
+    return res.status(500).json({ message: "Server error" });
   }
 };
