@@ -1,4 +1,4 @@
-import {register,login,logout,getUser,updateProfile,getActiveJobs} from "../controller/user_controller.js";
+import {register,login,logout,getUser,updateProfile,getActiveJobs,MyApplications} from "../controller/user_controller.js";
 import { isUserAuthenticated } from "../middlewares/is_user_authenticated.js";
 import express from "express";
 import upload from "../middlewares/multer.js";
@@ -12,4 +12,6 @@ router.route("/logout").get(logout);
 router.route("/profile/:id").get(isUserAuthenticated,getUser);
 router.route("/profile/edit").post(isUserAuthenticated,upload.fields([{name:"profilePic",maxCount:1},{name:"resume",maxCount:1}]),updateProfile);
 router.route("/activeJobs").get(isUserAuthenticated,getActiveJobs);
+router.route("/myApplications").get(isUserAuthenticated,MyApplications);
+
 export default router;

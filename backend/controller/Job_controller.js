@@ -1,17 +1,26 @@
 import Job from '../models/Job_model.js';
 import Employer from '../models/Employer_model.js';
 
-export const newJob = async(req, res) => {
+export const newJob = async (req, res) => {
     try {
-        const { title, description, salary, location, jobMetaData ,JobId} = req.body;
-        if(!title || !description || !location ||  !JobId){
-            return res.status(400).json({message: 'Please fill all fields'});
+        const { title, description, salary, location, jobMetaData, JobId } = req.body;
+        if (!title || !description || !location || !JobId) {
+            return res.status(400).json({ message: 'Please fill all fields' });
         }
+
         const employerId = req.employer._id;
-        const employer  = await Employer.findById(employerId);
-        if(!employer){
-            return res.status(400).json({message: 'Employer not found'});
+        console.log(employerId);
+        const employer = await Employer.findById(employerId);
+        if (!employer) {
+            return res.status(400).json({ message: 'Employer not found' });
         }
+
+        // Check for existing job with the same JobId for the specific employer
+        const jobExist = await Job.findOne({ JobId, employer: employerId });
+        if (jobExist) {
+            return res.status(400).json({ message: 'Job already exists for this employer' });
+        }
+
         const newJob = new Job({
             JobId,
             title,
@@ -19,17 +28,22 @@ export const newJob = async(req, res) => {
             salary,
             location,
             jobMetaData,
+            employer: employerId,
             company: employerId,
+            logo: employer.logo,
         });
+
         await newJob.save();
         employer.jobs.push(newJob._id);
         await employer.save();
-        return res.status(200).json({message: 'Job created successfully', job: newJob,success: true});
-
+        return res.status(200).json({ message: 'Job created successfully', job: newJob, success: true });
+        
     } catch (error) {
         console.log(error);
+        return res.status(500).json({ message: 'Server error' });
     }
-}
+};
+
 
 export const getJob = async(req, res) => {
     try {
@@ -68,3 +82,17 @@ export const jobStatus = async (req, res) => {
         return res.status(500).json({ message: 'Server error' });
     }
 };
+
+export const applicants = async (req, res) => {
+    try {
+        const { jobId } = req.params;
+        const job = await Job.findOne({ JobId: jobId }).populate('applicants');
+        if (!job) {
+            return res.status(404).json({ message: 'Job not found' });
+        }
+        return res.status(200).json({ applicants: job.applicants, success: true });
+    }
+    catch (error) {
+        console.log(error);
+    }
+}

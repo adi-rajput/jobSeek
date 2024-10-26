@@ -1,4 +1,5 @@
 import User from "../models/user_model.js";
+import Application from "../models/Application_model.js";
 import bcrypt from "bcrypt";
 
 import jwt from "jsonwebtoken";
@@ -182,7 +183,6 @@ export const updateProfile = async (req, res) => {
 
 export const getActiveJobs = async (req, res) => {
   try {
-      // Retrieve only jobs with status: true
       const jobs = await Job.find({ status: true });
 
       if (jobs.length === 0) {
@@ -193,5 +193,18 @@ export const getActiveJobs = async (req, res) => {
   } catch (error) {
       console.error("Error fetching active jobs:", error);
       return res.status(500).json({ message: 'Server error' });
+  }
+};
+
+export const MyApplications = async (req, res) => {
+  try {
+    const applications = await Application.find({ user: req.user._id });
+    if (applications.length === 0) {
+      return res.status(404).json({ message: "No applications found" });
+    }
+    return res.status(200).json({ applications });
+  } catch (error) {
+    console.error("Error fetching jobs:", error);
+    return res.status(500).json({ message: "Server error" });
   }
 };

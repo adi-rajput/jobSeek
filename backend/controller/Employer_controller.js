@@ -170,28 +170,10 @@ export const updateProfile = async (req, res) => {
   }
 };
 
-export const getJobs = async (req, res) => {
+export const getMyJobs = async (req, res) => {
   try {
-    // Ensure employer is authenticated
-    if (!req.employer || !req.employer._id) {
-      return res.status(400).json({ message: "Invalid employer" });
-    }
-
-    // Fetch the employer document
-    const employer = await Employer.findById(req.employer._id).populate('jobs');
-    
-    // Check if employer exists
-    if (!employer) {
-      return res.status(404).json({ message: "Employer not found", success: false });
-    }
-
-    // Return the jobs array from the employer document
-    const jobs = employer.jobs; // This will contain the populated Job documents
-
-    if (jobs.length === 0) {
-      return res.status(404).json({ message: "No jobs found for this employer", success: false });
-    }
-
+    const employerId = req.employer._id;
+    const jobs = await Job.find({ employer: employerId });
     return res.status(200).json({ jobs, success: true });
   } catch (error) {
     console.error("Error fetching jobs:", error);

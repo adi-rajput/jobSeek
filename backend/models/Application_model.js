@@ -2,7 +2,19 @@ import mongoose from "mongoose";
 
 const ApplicationSchema = new mongoose.Schema(
   {
-    job : {
+    name: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+    },
+    phone: {
+      type: String,
+      required: true,
+    },
+    job: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Job",
       required: true,
@@ -25,19 +37,18 @@ const ApplicationSchema = new mongoose.Schema(
       {
         question: {
           type: String,
-          required: true,
         },
         answer: {
           type: String,
-          required: true,
         },
       },
     ],
-
-
   },
   { timestamps: true }
 );
+
+// Create a unique index for job and user combination
+ApplicationSchema.index({ job: 1, user: 1 }, { unique: true });
 
 const Application = mongoose.model("Application", ApplicationSchema);
 
