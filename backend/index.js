@@ -7,6 +7,7 @@ import userRoutes from './routes/User_routes.js';
 import employerRoutes from  './routes/employer_routes.js';
 import jobRoutes from './routes/Job_routes.js';
 import applicationRoutes from './routes/application_routes.js';
+import guestRoutes from './routes/guest_routes.js';
 const app = express();
 
 //middleware
@@ -40,6 +41,7 @@ app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/employers', employerRoutes);
 app.use('/api/v1/jobs', jobRoutes);
 app.use('/api/v1/applications', applicationRoutes);
+app.use('/api/v1/guest', guestRoutes);
 
 
 const PORT = process.env.PORT || 8000;
