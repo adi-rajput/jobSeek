@@ -7,6 +7,7 @@ import UserSignupForm from "./component/user_register.jsx";
 import User_login from "./component/user_login.jsx";
 import Employer_login from "./component/employer_login.jsx";
 import Employer_register from "./component/employer_register.jsx";
+import guest_login from "./component/guest_login.jsx";
 
 const Router = createBrowserRouter([
   {
@@ -32,6 +33,10 @@ const Router = createBrowserRouter([
     path: "/employer_register",
     element: <Employer_register/>,
   },
+  {
+    path: "/guestLogin",
+    element: <guest_login/>,
+  }
 ]);
 
 createRoot(document.getElementById("root")).render(<RouterProvider router={Router} />);

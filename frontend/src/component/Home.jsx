@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-
+import GuestUserCard from './guest_login';
 const WelcomePage = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gradient-to-r from-purple-500 to-blue-500">
@@ -53,6 +53,7 @@ const WelcomePage = () => {
           </Link>
         </div>
       </div>
+         <GuestUserCard />
     </div>
   );
 };
