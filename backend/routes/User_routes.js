@@ -14,4 +14,4 @@ router.route("/profile/edit").post(isUserAuthenticated,upload.fields([{name:"pro
 router.route("/activeJobs").get(isUserAuthenticated,getActiveJobs);
 router.route("/myApplications").get(isUserAuthenticated,MyApplications);
 
-export default router;
+export default router;  
