@@ -87,7 +87,8 @@ export const login = async (req, res) => {
         success: true,
         token,
         userData,
-      });
+      })
+      ;
   } catch (error) {
     console.log("Error in login: ", error);
   }

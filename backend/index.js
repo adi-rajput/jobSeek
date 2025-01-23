@@ -9,6 +9,7 @@ import jobRoutes from './routes/Job_routes.js';
 import applicationRoutes from './routes/application_routes.js';
 import guestRoutes from './routes/guest_routes.js';
 import interviewRoutes from './routes/interview_routes.js';
+//import { verifyLoggedInUser } from './middlewares/extract_email.js';
 const app = express();
 
 //middleware

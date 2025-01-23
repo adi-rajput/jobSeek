@@ -1,11 +1,19 @@
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 dotenv.config();
+
+//import { getLoggedInUserEmail } from '../middlewares/extract_email.js';
+
 export const sendEmail = async (options) => {
   try {
     // Validate inputs
     if (!options.to) throw new Error('Recipient email is required');
     if (!options.subject) throw new Error('Subject is required');
+    if (!options.from) throw new Error('Sender email is required');
+    // Extract the email from middleware (getLoggedInUserEmail)
+   // const loggedInUserEmail = await getLoggedInUserEmail();  // Using the middleware to fetch the email
+
+    //if (!loggedInUserEmail) throw new Error('Logged-in user email is missing');
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -16,7 +24,7 @@ export const sendEmail = async (options) => {
     });
 
     const mailOptions = {
-      from: `"Your App" <${process.env.EMAIL}>`,
+      from: `"Your App" <${process.env.EMAIL}>`,  // Use the extracted email from middleware
       to: options.to,
       subject: options.subject,
       text: options.text || 'No text content',
@@ -32,19 +40,4 @@ export const sendEmail = async (options) => {
     console.error("Detailed Email Error:", error);
     throw error;
   }
-}
-
-// async function main() {
-//   try {
-//     await sendEmail({
-//       to: "ar9412349716@gmail.com",
-//       subject: "Test Email",
-//       text: "Hello world?",
-//       html: "<b>Hello world?</b>"
-//     });
-//   } catch (error) {
-//     console.error("Main Error:", error.message);
-//   }
-// }
-
-// main();
+};
