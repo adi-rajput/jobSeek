@@ -1,12 +1,11 @@
-import { application } from "express";
 import mongoose from "mongoose";
-import { type } from "os";
 
 const JobSchema = new mongoose.Schema(
   {
     JobId: {
-      type: Number,
+      type: String,
       required: true,
+      unique: true,
     },
     title: {
       type: String,
@@ -14,55 +13,61 @@ const JobSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      
     },
     salary: {
       type: Number,
     },
     location: {
       type: String,
-      required : true,
+      required: true,
     },
-    company: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Employer",
-      },
-    ],
     employer: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Employer",
+      ref: "User", // Referencing the User model for employer
+      required: true,
     },
     logo: {
-      type: String, 
-      default: ""
+      type: String,
+      default: "",
     },
     applicants: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Application",
+        user: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User", // Job seekers who apply
+        },
+        answers: [
+          {
+            question: String,
+            answer: String,
+          },
+        ],
+        resume: String, // Resume file URL
+        appliedAt: {
+          type: Date,
+          default: Date.now,
+        },
       },
     ],
-    jobMetaData: {
-      type: [
-        {
-          question: {
-            type: String,
-          },
+    jobMetaData: [
+      {
+        question: {
+          type: String,
         },
-      ],
-      default: [],
-    },
+      },
+    ],
     status: {
-      type: Boolean,
+      type: String,
+      enum: ["active", "closed"], 
+      default: "active",          
+    },
+    company: {
+      type : String,
       required: true,
-      default: true,
     },
   },
   { timestamps: true }
 );
-
-JobSchema.index({ JobId: 1, employer: 1 }, { unique: true });
 
 const Job = mongoose.model("Job", JobSchema);
 export default Job;

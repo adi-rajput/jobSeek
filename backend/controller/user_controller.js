@@ -1,211 +1,210 @@
-import User from "../models/user_model.js";
-import Application from "../models/Application_model.js";
+import User from "../models/user_model.js"
+import Job from "../models/Job_model.js";
 import bcrypt from "bcrypt";
-
 import jwt from "jsonwebtoken";
-import upload from "../middlewares/multer.js";
 import getDataUri from "../middlewares/data_uri.js";
 import cloudinary from "../middlewares/cloudinary.js";
-import Job from "../models/Job_model.js";
+import Application from "../models/Application_model.js";
 
+// Register User (Job Seeker, Employer, Admin)
 export const register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
-
-    if (!name || !email || !password) {
+    const { name, email, password, role , company } = req.body;
+    if (!name || !email || !password || !role) {
       return res.status(400).json({ message: "Please enter all fields" });
     }
     if (password.length < 6) {
-      return res
-        .status(400)
-        .json({ message: "Password must be at least 6 characters long" });
+      return res.status(400).json({ message: "Password must be at least 6 characters long" });
     }
-
+    
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
     }
-
+    const companyDetails = { companyName: company, verified: false };
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    const newUser = new User({ name, email, password: hashedPassword });
+    if(role === "Employer"){
+      const newUser = new User({ name, email, password: hashedPassword, role, companyDetails });
+    }
+    else{
+      const newUser = new User({ name, email, password: hashedPassword, role });
+    }
     await newUser.save();
-
-    res
-      .status(200)
-      .json({
-        message: "User registered successfully",
-        success: true,
-        newUser,
-      });
+    
+    res.status(201).json({ message: "User registered successfully", success: true });
   } catch (error) {
-    console.log("Error in register: ", error);
+    console.error("Error in register:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
 
+// Login
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
       return res.status(400).json({ message: "Please enter all fields" });
     }
-    if (password.length < 6) {
-      return res
-        .status(400)
-        .json({ message: "Password must be at least 6 characters long" });
-    }
+    
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ message: "User does not exist" });
+      return res.status(400).json({ message: "User not found" });
     }
+    
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
-
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
-    const userData = {
-      name: user.name,
-      email: user.email,
-      phone: user.phone,
-      profilePic: user.profilePic,
-      resume: user.resume,
-    };
-
-    return res
-      .cookie("token", token, {
-        httpOnly: true,
-        sameSite: "strict",
-        maxAge: 1 * 24 * 60 * 60 * 1000,
-      })
-      .status(200)
-      .json({
-        message: "Logged in successfully",
-        success: true,
-        token,
-        userData,
-      })
-      ;
+    
+    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "7d" });
+    res.cookie("token", token, { httpOnly: true, sameSite: "strict", maxAge: 7 * 24 * 60 * 60 * 1000 });
+    
+    res.status(200).json({ message: "Logged in successfully", success: true, token, user });
   } catch (error) {
-    console.log("Error in login: ", error);
+    console.error("Error in login:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
+// Logout
 export const logout = async (req, res) => {
   try {
     res.clearCookie("token");
-    return res.status(200).json({ message: "Logged out" });
+    res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
-    console.log("Error in logout: ", error);
+    console.error("Error in logout:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
-export const getUser = async (req, res) => {
+// Get User Profile
+export const getProfile = async (req, res) => {
   try {
-    const ID = req.params.id;
-    const user = await User.findById(ID).select("-password");
-    if (!user) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
-    }
-    return res.status(200).json({
-      user,
-      success: true,
-    });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({ success: false, message: "Server error" });
-  }
-};
-
-
-export const updateProfile = async (req, res) => {
-  try {
-    if (!req.user) {
-      return res.status(401).json({ message: "User not authenticated" });
-    }
-
-    const userId = req.user._id;
-    const { experience } = req.body;
-    const profilePic = req.files.profilePic ? req.files.profilePic[0] : null;
-    const resume = req.files.resume ? req.files.resume[0] : null;
-
-    let cloudResponse;
-    if (profilePic) {
-      const file = getDataUri(profilePic);
-      cloudResponse = await cloudinary.uploader.upload(file);
-    }
-
-    let cloudResponse2;
-    if (resume) {
-      const file2 = getDataUri(resume);
-      cloudResponse2 = await cloudinary.uploader.upload(file2,{
-        format: "pdf",
-        transformation: {
-          width: 400,
-          Height: 600,
-          crop: "limit"}
-      });
-    }
-
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    if (experience) {
-      user.experience = experience;
-    } 
-    if (profilePic && cloudResponse) {
-      user.profilePic = cloudResponse.secure_url;
-    }
-    if (resume && cloudResponse2) {
-      user.resume = cloudResponse2.secure_url;
-    }
-
-    await user.save();
-
-    return res.status(200).json({
-      message: "Profile updated successfully",
-      success: true,
-      user,
-    });
-
+    const user = await User.findById(req.user.id).select("-password");
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.status(200).json({ user });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "An error occurred while updating the profile" });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
-
-export const getActiveJobs = async (req, res) => {
+// Update Profile
+export const updateProfile = async (req, res) => {
   try {
-      const jobs = await Job.find({ status: true });
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    
+    const { name , experience , company , address} = req.body;
+    const companyDetails = { companyName: company, companyAddress: address, verified: false };
+    if(name) user.name = name;
+    if(experience) user.experience = experience;
+    if(company) user.companyDetails = companyDetails;
 
-      if (jobs.length === 0) {
-          return res.status(404).json({ message: 'No active jobs available', success: false });
-      }
+    // Handle profilePic
+    if (req.files && req.files.profilePic) {
+      const profilePicFile = getDataUri(req.files.profilePic[0]);
+      const cloudResponse = await cloudinary.uploader.upload(profilePicFile);
+      user.profilePic = cloudResponse.secure_url;
+    }
+
+    // Handle resume
+    if (req.files && req.files.resume) {
+      const resumeFile = getDataUri(req.files.resume[0]);
+      const cloudResponse = await cloudinary.uploader.upload(resumeFile);
+      user.resume = cloudResponse.secure_url;
+    }
+    
+    await user.save();
+    res.status(200).json({ message: "Profile updated successfully", user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error updating profile" });
+  }
+};
+
+// // Employer: Create Job
+// export const createJob = async (req, res) => {
+//   try {
+//     if (req.user.role !== "Employer") return res.status(403).json({ message: "Access denied" });
+    
+//     const { title, description, salary } = req.body;
+//     if (!title || !description || !salary) return res.status(400).json({ message: "All fields are required" });
+    
+//     const newJob = new Job({ title, description, salary, employer: req.user.id });
+//     await newJob.save();
+    
+//     res.status(201).json({ message: "Job created successfully", newJob });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: "Error creating job" });
+//   }
+// };
+
+// Job Seeker: Apply for Job
+// export const applyForJob = async (req, res) => {
+//   try {
+//     if (req.user.role !== "User") return res.status(403).json({ message: "Access denied" });
+    
+//     const { jobId } = req.body;
+//     const job = await Job.findById(jobId);
+//     if (!job) return res.status(404).json({ message: "Job not found" });
+    
+//     if (job.applicants.includes(req.user.id)) return res.status(400).json({ message: "Already applied" });
+    
+//     job.applicants.push(req.user.id);
+//     await job.save();
+//     res.status(200).json({ message: "Applied successfully" });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: "Error applying for job" });
+//   }
+// };
+
+// Admin: Approve Employer
+export const approveEmployer = async (req, res) => {
+  try {
+    if (req.user.role !== "Admin") return res.status(403).json({ message: "Access denied" });
+    
+    const { employerId } = req.body;
+    const employer = await User.findById(employerId);
+    if (!employer || employer.role !== "Employer") return res.status(404).json({ message: "Employer not found" });
+    
+    employer.companyDetails.verified = true;
+    await employer.save();
+    res.status(200).json({ message: "Employer approved successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error approving employer" });
+  }
+};
+
+export const getEmployerJobs = async (req, res) => {
+  try {
+      if(role !== "Employer") return res.status(403).json({ message: "Access denied" });
+      const employerId = req.user._id; // Assuming req.user contains the authenticated employer
+      
+      const jobs = await Job.find({ employer: employerId });
 
       return res.status(200).json({ jobs, success: true });
   } catch (error) {
-      console.error("Error fetching active jobs:", error);
-      return res.status(500).json({ message: 'Server error' });
+      console.error("Error fetching employer jobs:", error);
+      return res.status(500).json({ message: "Server error" });
   }
 };
 
-export const MyApplications = async (req, res) => {
+export const getUserAppliedJobs = async (req, res) => {
   try {
-    const applications = await Application.find({ user: req.user._id });
-    if (applications.length === 0) {
-      return res.status(404).json({ message: "No applications found" });
-    }
-    return res.status(200).json({ applications });
+      const userId = req.user._id;
+      // Find applications by the user and populate job details
+      const applications = await Application.find({ user: userId }).populate("job");
+
+      // Extract job details from applications
+      const appliedJobs = applications.map((app) => app.job);
+
+      return res.status(200).json({ appliedJobs, success: true });
   } catch (error) {
-    console.error("Error fetching jobs:", error);
-    return res.status(500).json({ message: "Server error" });
+      console.error("Error fetching applied jobs:", error);
+      return res.status(500).json({ message: "Server error" });
   }
 };

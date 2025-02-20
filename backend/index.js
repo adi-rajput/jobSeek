@@ -4,11 +4,11 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import connectDB from './utils/db.js';
 import userRoutes from './routes/User_routes.js';
-import employerRoutes from  './routes/employer_routes.js';
+//import employerRoutes from  './routes/employer_routes.js';
 import jobRoutes from './routes/Job_routes.js';
 import applicationRoutes from './routes/application_routes.js';
 import guestRoutes from './routes/guest_routes.js';
-import interviewRoutes from './routes/interview_routes.js';
+//import interviewRoutes from './routes/interview_routes.js';
 //import { verifyLoggedInUser } from './middlewares/extract_email.js';
 const app = express();
 
@@ -40,11 +40,11 @@ app.get('/', (req, res) => {
 //routes
 
 app.use('/api/v1/users', userRoutes);
-app.use('/api/v1/employers', employerRoutes);
+//app.use('/api/v1/employers', employerRoutes);
 app.use('/api/v1/jobs', jobRoutes);
 app.use('/api/v1/applications', applicationRoutes);
 app.use('/api/v1/guest', guestRoutes);
-app.use('/api/v1/interview', interviewRoutes); 
+//app.use('/api/v1/interview', interviewRoutes); 
 
 const PORT = 3000
 app.listen(PORT, () => {
