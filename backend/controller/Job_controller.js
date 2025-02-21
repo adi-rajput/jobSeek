@@ -1,7 +1,6 @@
 import Job from '../models/Job_model.js';
 import User from '../models/user_model.js';
 
-// Create a new job (Employer only)
 export const newJob = async (req, res) => {
     try {
         const { title, description, salary, location, jobMetaData, JobId ,company } = req.body;
@@ -14,7 +13,6 @@ export const newJob = async (req, res) => {
             return res.status(403).json({ message: 'Unauthorized: Only employers can post jobs' });
         }
 
-        // Check for existing job with the same JobId for the specific employer
         const jobExist = await Job.findOne({ JobId, employer: employerId });
         if (jobExist) {
             return res.status(400).json({ message: 'Job already exists for this employer' });
@@ -28,7 +26,7 @@ export const newJob = async (req, res) => {
             location,
             jobMetaData,
             employer: employerId,
-            company: company, // Reference to employer user
+            company: company,
             logo: req.user.companyLogo || "",
         });
 
@@ -40,7 +38,6 @@ export const newJob = async (req, res) => {
     }
 };
 
-// Get a job by JobId
 export const getJob = async (req, res) => {
     try {
         const { jobId } = req.params;
@@ -55,38 +52,45 @@ export const getJob = async (req, res) => {
     }
 };
 
-// Update job status (Employer only)
 export const updateJobStatus = async (req, res) => {
     try {
-        const { jobId } = req.params;
+        const { JobId } = req.params;
         const { status } = req.body;
 
-        // Validate status value
-        const validStatuses = ["active", "closed"];
-        if (!validStatuses.includes(status)) {
-            return res.status(400).json({ message: 'Invalid status. Allowed values: active, closed.' });
+        if (!req.user || !req.user._id) {
+            return res.status(401).json({ message: "Unauthorized: No user found." });
         }
 
-        // Update job status if it belongs to the logged-in employer
+        const allowedStatuses = ["active", "closed"];
+        if (!allowedStatuses.includes(status)) {
+            return res.status(400).json({ message: "Invalid status. Allowed values: active, closed." });
+        }
+
+        console.log(`User ID: ${req.user._id}, Job ID: ${JobId}`);
+
         const job = await Job.findOneAndUpdate(
-            { _id: jobId, employer: req.user._id }, 
+            { JobId },
             { status }, 
-            { new: true }
+            { new: true, runValidators: true } 
         );
 
         if (!job) {
-            return res.status(404).json({ message: 'Job not found or unauthorized' });
+            return res.status(404).json({ message: "Job not found." });
+        }
+
+        console.log(`Job Employer ID: ${job.employer}`);
+
+        if (job.employer.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: "Forbidden: You are not authorized to update this job." });
         }
 
         return res.status(200).json({ message: `Job status updated to ${status}.`, job, success: true });
     } catch (error) {
-        console.error("Error updating job status:", error.message || error);
-        return res.status(500).json({ message: 'Server error' });
+        console.error("Error updating job status:", error);
+        return res.status(500).json({ message: "Server error" });
     }
 };
 
-
-// Get all applicants for a job (Employer only)
 export const applicants = async (req, res) => {
     try {
         const { jobId } = req.params;
