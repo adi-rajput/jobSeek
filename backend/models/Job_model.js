@@ -23,7 +23,7 @@ const JobSchema = new mongoose.Schema(
     },
     employer: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User", 
+      ref: "User", // Referencing the User model for employer
       required: true,
     },
     logo: {

@@ -30,6 +30,6 @@ router.route("/profile/edit").post(
 //router.route("/createJob").post(isUserAuthenticated, createJob);
 router.route("/admin/approveEmployer").post(isUserAuthenticated, approveEmployer);
 router.route("/employer/jobs").get(isUserAuthenticated, getEmployerJobs);
-router.route("/user/appliedJobs").get(isUserAuthenticated, getUserAppliedJobs);
+router.route("/appliedJobs").get(isUserAuthenticated, getUserAppliedJobs);
 
 export default router;

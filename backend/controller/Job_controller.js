@@ -94,14 +94,16 @@ export const updateJobStatus = async (req, res) => {
 export const applicants = async (req, res) => {
     try {
         const { jobId } = req.params;
-        const job = await Job.findOne({ JobId: jobId, employer: req.user._id }).populate('applicants.user', 'name email resume');
-        
+        const job = await Job.findOne({ _id: jobId, employer: req.user._id });
+
         if (!job) {
             return res.status(404).json({ message: 'Job not found or unauthorized' });
         }
+
         return res.status(200).json({ applicants: job.applicants, success: true });
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: 'Server error' });
     }
 };
+
