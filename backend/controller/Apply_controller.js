@@ -8,31 +8,26 @@ export const apply = async (req, res) => {
     try {
         const { answers } = req.body;
         const { id } = req.params;
-
-        // Check if the job exists
+        const {email,name,phone} = req.body;
         const job = await Job.findById(id);
         if (!job) {
             return res.status(404).json({ message: "Job not found" });
         }
 
-        // Check if the user exists
         const user = await User.findById(req.user._id);
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
 
-        // Only users can apply, not employers or admins
         if (req.user.role !== "User") {
             return res.status(403).json({ message: "Only users can apply for jobs" });
         }
 
-        // Check if the user has already applied for this job
         const existingApplication = await Application.findOne({ job: id, user: req.user._id });
         if (existingApplication) {
             return res.status(400).json({ message: "You have already applied for this job" });
         }
 
-        // Validate answers for jobMetaData questions
         const questions = job.jobMetaData;
         if (questions.length > 0) {
             if (!answers || answers.length !== questions.length) {
@@ -49,43 +44,42 @@ export const apply = async (req, res) => {
             }
         }
 
-        // Handle resume upload
-        const resume = req.file;
-        let resumeUrl = "";
-        if (resume) {
+        let resumeUrl = user.resume;
+
+        if (!resumeUrl) {
+            const resume = req.file;
+            if (!resume) {
+                return res.status(400).json({ message: "Resume is required if not already uploaded" });
+            }
+
             const file = getDataUri(resume);
             const response = await cloudinary.uploader.upload(file.content, {
                 resource_type: "raw",
                 folder: "resumes",
             });
             resumeUrl = response.secure_url;
+
+            user.resume = resumeUrl;
+            await user.save();
         }
 
-        if (!resumeUrl) {
-            return res.status(400).json({ message: "Resume upload failed" });
-        }
-
-        // Map question-answer pairs
         const questionAnswerPairs = job.jobMetaData.map((questionMeta, index) => ({
             question: questionMeta.question,
             answer: answers[index]?.answer || "",
         }));
 
-        // Create new application
         const newApplication = new Application({
-            name: user.name,
-            email: user.email,
-            phone: user.phone,
+            name: name,
+            email: email,
+            phone: phone,
             user: req.user._id,
             job: job._id,
             resume: resumeUrl,
             answers: questionAnswerPairs,
-            status: "applied",
         });
 
         await newApplication.save();
 
-        // Update job and user with application reference
         job.applicants.push(newApplication._id);
         await job.save();
 
@@ -102,6 +96,8 @@ export const apply = async (req, res) => {
         return res.status(500).json({ message: "Server error" });
     }
 };
+
+
 
 
 export const getApplication = async (req, res) => {

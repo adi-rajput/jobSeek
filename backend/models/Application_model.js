@@ -47,9 +47,7 @@ const ApplicationSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Create a unique index for job and user combination
 ApplicationSchema.index({ job: 1, user: 1 }, { unique: true });
 
 const Application = mongoose.model("Application", ApplicationSchema);
-
 export default Application;

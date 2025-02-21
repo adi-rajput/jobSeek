@@ -23,7 +23,7 @@ const JobSchema = new mongoose.Schema(
     },
     employer: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // Referencing the User model for employer
+      ref: "User", 
       required: true,
     },
     logo: {
@@ -34,7 +34,7 @@ const JobSchema = new mongoose.Schema(
       {
         user: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "User", // Job seekers who apply
+          ref: "User", 
         },
         answers: [
           {
@@ -42,7 +42,7 @@ const JobSchema = new mongoose.Schema(
             answer: String,
           },
         ],
-        resume: String, // Resume file URL
+        resume: String, 
         appliedAt: {
           type: Date,
           default: Date.now,
