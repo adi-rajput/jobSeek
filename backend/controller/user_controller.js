@@ -6,7 +6,6 @@ import getDataUri from "../middlewares/data_uri.js";
 import cloudinary from "../middlewares/cloudinary.js";
 import Application from "../models/Application_model.js";
 
-// Register User (Job Seeker, Employer, Admin)
 export const register = async (req, res) => {
   try {
     const { name, email, password, role , company } = req.body;
@@ -185,12 +184,18 @@ export const approveEmployer = async (req, res) => {
     res.status(500).json({ message: "Error approving employer" });
   }
 };
-
 export const getEmployerJobs = async (req, res) => {
   try {
-      if(role !== "Employer") return res.status(403).json({ message: "Access denied" });
-      const employerId = req.user._id; // Assuming req.user contains the authenticated employer
-      
+      if (!req.user) {
+          return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const { role, _id: employerId } = req.user;
+
+      if (role !== "Employer") {
+          return res.status(403).json({ message: "Access denied" });
+      }
+
       const jobs = await Job.find({ employer: employerId });
 
       return res.status(200).json({ jobs, success: true });
