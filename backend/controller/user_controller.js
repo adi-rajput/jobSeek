@@ -21,13 +21,14 @@ export const register = async (req, res) => {
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
     }
-    const companyDetails = { companyName: company, verified: false };
+    const companyDetails = { companyName: company, verified: false};
     const hashedPassword = await bcrypt.hash(password, 10);
+    let newUser;
     if(role === "Employer"){
-      const newUser = new User({ name, email, password: hashedPassword, role, companyDetails });
+       newUser = new User({ name, email, password: hashedPassword, role, companyDetails });
     }
     else{
-      const newUser = new User({ name, email, password: hashedPassword, role });
+       newUser = new User({ name, email, password: hashedPassword, role });
     }
     await newUser.save();
     
@@ -113,6 +114,12 @@ export const updateProfile = async (req, res) => {
       const resumeFile = getDataUri(req.files.resume[0]);
       const cloudResponse = await cloudinary.uploader.upload(resumeFile);
       user.resume = cloudResponse.secure_url;
+    }
+
+    if(req.files && req.files.companyLogo){
+      const companyLogo = getDataUri(req.files.companyLogo[0]);
+      const cloudResponse = await cloudinary.uploader.upload(companyLogo);
+      user.companyDetails.companyLogo = cloudResponse.secure_url;
     }
     
     await user.save();

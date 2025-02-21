@@ -35,14 +35,14 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['User', 'Employer', 'Admin'], // ⬅️ Define user roles
-        default: 'User', // Default role is User (Contractor)
+        enum: ['User', 'Employer', 'Admin'], 
+        default: 'User', 
     },
     companyDetails: {
-        // ⬅️ Only required for Employers
         companyName: { type: String, default: '' },
         companyAddress: { type: String, default: '' },
-        verified: { type: Boolean, default: false }, // ⬅️ Admin will verify this
+        verified: { type: Boolean, default: false }, 
+        companyLogo: { type: String, default: '' },
     },
     createdAt: {
         type: Date,
