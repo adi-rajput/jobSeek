@@ -115,7 +115,7 @@ export const forgotPassword = async (req, res) => {
 
 export const resetPassword = async (req, res) => {
   try {
-    const { token } = req.params;
+    const { token } = req.query.token || req.body;
     const {  newPassword } = req.body;
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.id;
