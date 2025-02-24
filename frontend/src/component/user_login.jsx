@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
+const ApiUrl = import.meta.env.VITE_API_URL;
 const UserLogin = () => {
   const [formData, setFormData] = useState({
     email: '',
@@ -20,7 +21,7 @@ const UserLogin = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        `http://localhost:8000/api/v1/users/login`,
+        `${ApiUrl}/api/v1/users/login`,
         formData,
         {
           headers: {
