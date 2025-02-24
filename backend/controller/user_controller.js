@@ -97,7 +97,7 @@ export const forgotPassword = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '10m' });
-    const resetLink = `http://localhost:${process.env.PORT}/auth/reset-password?token=${token}`;
+    const resetLink = `https://jobseek-96z4.onrender.com/api/v1/users/resetPassword?token=${token}`;
     const mailOptions = {
       from: process.env.EMAIL,
       to: email,
@@ -115,7 +115,8 @@ export const forgotPassword = async (req, res) => {
 
 export const resetPassword = async (req, res) => {
   try {
-    const { token, newPassword } = req.body;
+    const { token } = req.params;
+    const {  newPassword } = req.body;
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.id;
     const user = await User.findById(userId);
