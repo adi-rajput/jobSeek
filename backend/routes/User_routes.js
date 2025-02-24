@@ -8,7 +8,9 @@ import {
   //createJob, 
   approveEmployer, 
   getEmployerJobs, 
-  getUserAppliedJobs 
+  getUserAppliedJobs,
+  resetPassword,
+  forgotPassword
 } from "../controller/user_controller.js";
 import { isUserAuthenticated } from "../middlewares/is_user_authenticated.js";
 import upload from "../middlewares/multer.js";
@@ -27,6 +29,8 @@ router.route("/profile/edit").post(
   ]),
   updateProfile
 );
+router.route("/resetPassword").post(resetPassword);
+router.route("/forgotPassword").post(forgotPassword);
 //router.route("/createJob").post(isUserAuthenticated, createJob);
 router.route("/admin/approveEmployer").post(isUserAuthenticated, approveEmployer);
 router.route("/employer/jobs").get(isUserAuthenticated, getEmployerJobs);
