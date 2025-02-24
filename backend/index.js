@@ -17,7 +17,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-const allowedOrigins = ['http://localhost:5173', 'http://localhost:3000']; // Add all your frontend origins here
+const allowedOrigins = ['http://localhost:5173', 'http://localhost:3000','*']; // Add all your frontend origins here
 
 app.use(cors({
   origin: function (origin, callback) {
