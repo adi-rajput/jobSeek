@@ -11,12 +11,11 @@ const Navbar = () => {
           <img src={logo} alt="Logo" className="w-auto h-14 md:h-16" />
         </div>
 
-        {/* Desktop Navigation */}
         <div className="hidden space-x-6 text-lg md:flex">
-          <div className="cursor-pointer hover:text-gray-400">Home</div>
-          <div className="cursor-pointer hover:text-gray-400">Jobs</div>
-          <div className="cursor-pointer hover:text-gray-400">Applications</div>
-          <div className="cursor-pointer hover:text-gray-400">Notifications</div>
+          <div className="cursor-pointer hover:text-gray-500">Home</div>
+          <div className="cursor-pointer hover:text-gray-500">Jobs</div>
+          <div className="cursor-pointer hover:text-gray-500">Applications</div>
+          <div className="cursor-pointer hover:text-gray-500">Notifications</div>
         </div>
 
         <div className="hidden md:block">
@@ -25,7 +24,6 @@ const Navbar = () => {
           </button>
         </div>
 
-        {/* Mobile Menu Button */}
         <div className="md:hidden">
           <button onClick={() => setOpen(!open)} className="text-2xl">
             {open ? "✖" : "☰"}
@@ -35,10 +33,10 @@ const Navbar = () => {
 
       {open && (
         <div className="flex flex-col items-center py-4 space-y-4 bg-gray-800 md:hidden">
-          <div className="cursor-pointer hover:text-gray-400">Home</div>
-          <div className="cursor-pointer hover:text-gray-400">Jobs</div>
-          <div className="cursor-pointer hover:text-gray-400">Applications</div>
-          <div className="cursor-pointer hover:text-gray-400">Notifications</div>
+          <div className="cursor-pointer hover:text-gray-500">Home</div>
+          <div className="cursor-pointer hover:text-gray-500">Jobs</div>
+          <div className="cursor-pointer hover:text-gray-500">Applications</div>
+          <div className="cursor-pointer hover:text-gray-500">Notifications</div>
           <button className="px-4 py-2 bg-blue-500 rounded-md hover:bg-blue-600">
             Register
           </button>
