@@ -1,6 +1,6 @@
 import { useState } from "react";
 import logo from "../assets/logo.png";
-
+import { Link } from "react-router-dom";
 const Navbar = () => {
   const [open, setOpen] = useState(false);
 
@@ -15,13 +15,17 @@ const Navbar = () => {
           <div className="cursor-pointer hover:text-gray-500">Home</div>
           <div className="cursor-pointer hover:text-gray-500">Jobs</div>
           <div className="cursor-pointer hover:text-gray-500">Applications</div>
-          <div className="cursor-pointer hover:text-gray-500">Notifications</div>
+          <div className="cursor-pointer hover:text-gray-500">
+            Notifications
+          </div>
         </div>
 
         <div className="hidden md:block">
-          <button className="px-4 py-2 bg-blue-500 rounded-md hover:bg-blue-600">
-            Register
-          </button>
+        <Link to="/register">
+            <button className="px-4 py-2 bg-blue-500 rounded-md hover:bg-blue-600">
+              Register
+            </button>
+          </Link>
         </div>
 
         <div className="md:hidden">
@@ -36,10 +40,15 @@ const Navbar = () => {
           <div className="cursor-pointer hover:text-gray-500">Home</div>
           <div className="cursor-pointer hover:text-gray-500">Jobs</div>
           <div className="cursor-pointer hover:text-gray-500">Applications</div>
-          <div className="cursor-pointer hover:text-gray-500">Notifications</div>
-          <button className="px-4 py-2 bg-blue-500 rounded-md hover:bg-blue-600">
-            Register
-          </button>
+          <div className="cursor-pointer hover:text-gray-500">
+            Notifications
+          </div>
+
+          <Link to="/register">
+            <button className="px-4 py-2 bg-blue-500 rounded-md hover:bg-blue-600">
+              Register
+            </button>
+          </Link>
         </div>
       )}
     </nav>
