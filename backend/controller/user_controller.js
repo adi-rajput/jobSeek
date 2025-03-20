@@ -28,6 +28,9 @@ export const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     let newUser;
     if (role === "Employer") {
+      if(!company) {
+        return res.status(400).json({ message: "Company name is required" });
+      }
       newUser = new User({ name, email, password: hashedPassword, role, companyDetails });
     } else {
       newUser = new User({ name, email, password: hashedPassword, role });
@@ -97,7 +100,7 @@ export const forgotPassword = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '10m' });
-    const resetLink = `https://jobseek-96z4.onrender.com/api/v1/users/resetPassword?token=${token}`;
+    const resetLink = `http://localhost:3000/api/v1/users/resetPassword?token=${token}`;
     const mailOptions = {
       from: process.env.EMAIL,
       to: email,

@@ -29,6 +29,10 @@ router.route("/profile/edit").post(
   ]),
   updateProfile
 );
+router.get('/resetPassword', (req, res) => {
+  const token = req.query.token;
+  return res.redirect(`http://localhost:5173/resetPassword?token=${token}`);
+});
 router.route("/resetPassword").post(resetPassword);
 router.route("/forgotPassword").post(forgotPassword);
 //router.route("/createJob").post(isUserAuthenticated, createJob);
