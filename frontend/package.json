@@ -10,12 +10,18 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^2.6.1",
     "axios": "^1.8.4",
     "dotenv": "^16.4.7",
+    "lucide-react": "^0.487.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-icons": "^5.5.0",
+    "react-redux": "^9.2.0",
     "react-router-dom": "^6.27.0",
     "react-toastify": "^11.0.5",
+    "redux-toolkit": "^1.1.2",
+    "shadcn": "^2.4.0-canary.17",
     "zod": "^3.23.8"
   },
   "devDependencies": {
